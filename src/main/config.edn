@@ -1,0 +1,28 @@
+{;;include secrets (that's only server side)
+ :secrets #include "secrets.edn"
+
+ ;; ;; configuration for redis connection
+ ;; :redis-tower
+ ;; {:host #or [#env REDIS_SERVICE_HOST "localhost"]
+ ;;  :port #long #or [#env REDIS_SERVICE_PORT 6379]}
+
+ ;; ;; configuration for rethink-db connection
+ ;; :rethink-tower
+ ;; [:host     #or [#env RETHINK_SERVICE_HOST "localhost"]
+ ;;  :port     #long #or [#env RETHINK_PORT_28015_TCP_PORT 28015]
+ ;;  :db       #or [#env RETHINK_DB  "slow"]
+ ;;  :token    0
+ ;;  :auth-key "" ]
+
+ ;; the actual integrant system
+ :ig/system
+ {
+
+  :app.site.ssl-context/ssl-context {:cert-file #ref [:secrets :cert-file]
+                                     :key-file  #ref [:secrets :key-file]}
+
+  :app.server/web {:port         #long 8020
+                   :ssl          true
+                   :ssl-context  #ig/ref :app.site.ssl-context/ssl-context
+                   :token-secret #ref [:secrets :auth0-jwt-secret]}
+  }}
